@@ -77,7 +77,7 @@ func NewGopher(layer int) {
 func gophEnter(cid int, nothing interface{}) int {
 	goph := event.GetEntity(cid).(*Gopher)
 	// With rotation this gets very slow
-	goph.R.(*render.Reverting).RevertAllAndModify(render.Rotate(goph.rotation))
+	goph.R.(*render.Reverting).RevertAndModify(1, render.Rotate(goph.rotation))
 	if goph.X() < minX || goph.X() > maxX {
 		goph.deltaX *= -1
 	}
