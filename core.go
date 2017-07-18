@@ -3,7 +3,7 @@ package main
 import (
 	"math/rand"
 
-	"bitbucket.org/oakmoundstudio/oak"
+	"github.com/oakmound/oak"
 	"github.com/oakmound/oak/entities"
 	"github.com/oakmound/oak/event"
 	"github.com/oakmound/oak/render"
