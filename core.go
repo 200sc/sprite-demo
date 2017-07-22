@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"path/filepath"
 
 	"github.com/oakmound/oak"
 	"github.com/oakmound/oak/entities"
@@ -66,7 +67,7 @@ func NewGopher(layer int) {
 	goph.Doodad = entities.NewDoodad(
 		rand.Float64()*576,
 		rand.Float64()*416,
-		render.NewReverting(render.LoadSprite("raw\\gopher11.png")),
+		render.NewReverting(render.LoadSprite(filepath.Join("raw", "gopher11.png"))),
 		goph.Init())
 	goph.R.SetLayer(layer)
 	goph.Bind(gophEnter, "EnterFrame")
