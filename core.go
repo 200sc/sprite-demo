@@ -3,6 +3,7 @@ package main
 import (
 	"math/rand"
 	"path/filepath"
+	"strconv"
 
 	"github.com/oakmound/oak"
 	"github.com/oakmound/oak/entities"
@@ -16,6 +17,8 @@ const (
 	maxX = 578
 	maxY = 416
 )
+
+var cache *render.Compound
 
 func main() {
 	oak.AddScene(
@@ -34,6 +37,14 @@ func main() {
 				}
 				return 0
 			}, "EnterFrame")
+			// Generate a rotation cache for comparison
+			// Compare the use of the cache against the use of a reverting type below
+			cache = render.NewCompound("0", make(map[string]render.Modifiable))
+			for i := 0; i < 360; i++ {
+				s := render.LoadSprite(filepath.Join("raw", "gopher11.png"))
+				s.Modify(render.Rotate(i))
+				cache.Add(strconv.Itoa(i), s)
+			}
 		},
 		func() bool {
 			return true
@@ -67,7 +78,8 @@ func NewGopher(layer int) {
 	goph.Doodad = entities.NewDoodad(
 		rand.Float64()*576,
 		rand.Float64()*416,
-		render.NewReverting(render.LoadSprite(filepath.Join("raw", "gopher11.png"))),
+		render.NewCompound("goph", map[string]render.Modifiable{"goph": render.EmptyRenderable()}),
+		//render.NewReverting(render.LoadSprite(filepath.Join("raw", "gopher11.png"))),
 		goph.Init())
 	goph.R.SetLayer(layer)
 	goph.Bind(gophEnter, "EnterFrame")
@@ -79,11 +91,11 @@ func NewGopher(layer int) {
 
 func gophEnter(cid int, nothing interface{}) int {
 	goph := event.GetEntity(cid).(*Gopher)
-	// With rotation this gets very slow
-	// consider commenting out this next line to compare with/without rotation
-	// We could speed this up by caching all of the 360 rotation images,
-	// but that would be a different benchmark.
-	goph.R.(*render.Reverting).RevertAndModify(1, render.Rotate(goph.rotation))
+
+	// Compare against this version of rotation
+	// (also swap the comments on lines in goph.Doodad's renderable)
+	//goph.R.(*render.Reverting).RevertAndModify(1, render.Rotate(goph.rotation))
+	goph.R.(*render.Compound).Add("goph", render.NewSprite(0, 0, cache.GetSub(strconv.Itoa(goph.rotation)).GetRGBA()))
 	if goph.X() < minX || goph.X() > maxX {
 		goph.deltaX *= -1
 	}
