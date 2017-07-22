@@ -24,6 +24,8 @@ func main() {
 			layerTxt := render.DefFont().NewIntText(&layer, 30, 20)
 			layerTxt.SetLayer(100000000)
 			render.Draw(layerTxt, 0)
+			NewGopher(layer)
+			layer++
 			event.GlobalBind(func(int, interface{}) int {
 				if oak.IsDown("K") {
 					NewGopher(layer)
@@ -77,6 +79,9 @@ func NewGopher(layer int) {
 func gophEnter(cid int, nothing interface{}) int {
 	goph := event.GetEntity(cid).(*Gopher)
 	// With rotation this gets very slow
+	// consider commenting out this next line to compare with/without rotation
+	// We could speed this up by caching all of the 360 rotation images,
+	// but that would be a different benchmark.
 	goph.R.(*render.Reverting).RevertAndModify(1, render.Rotate(goph.rotation))
 	if goph.X() < minX || goph.X() > maxX {
 		goph.deltaX *= -1
